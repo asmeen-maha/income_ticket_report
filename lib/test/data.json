@@ -1,0 +1,32 @@
+[    
+    {
+        "creditcard": 
+        [
+            {
+                "amount": "292600.00"
+            }
+        ], 
+        "notesandcoins": [
+            {
+                "ntype": "1000", 
+                "amount": "240000.00"
+            }, 
+            {
+                "ntype": "100", 
+                "amount": "7200.00"}, 
+            {
+                "ntype": "500", 
+                "amount": "2000.00"
+            }, 
+            {
+                "ntype": "50", 
+                "amount": "150.00"
+            }
+        ], 
+        "payeshop": [
+            {
+                "amount": 42100.00
+            }
+        ]
+    }
+]    
