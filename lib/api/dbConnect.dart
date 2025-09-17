@@ -125,4 +125,15 @@ class Dbconnect {
     // print(response.data);
     return "Y";
   }
+
+  Future<dynamic> saveCurrency({required dynamic data}) async {
+    FormData formData = FormData.fromMap({
+      "param": "savecurrency",
+      "data": jsonEncode(data)
+    });
+    print('saveCredit: ${formData.fields}');
+    Response response = await Dio().post(domain1, data: formData);
+    // print(response.data);
+    return "Y";
+  }
 }

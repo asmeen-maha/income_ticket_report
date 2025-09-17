@@ -13,6 +13,7 @@ import '../model/mdTransactionSumAll.dart';
 import '../report/dailyIncomeStatement.dart';
 import '../report/incomeReportA4LandscapeOnly.dart';
 import '../util/dateformat.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -27,7 +28,10 @@ class _HomeState extends State<Home> {
   final TextEditingController _dateController = TextEditingController(text: dateformat(date: DateTime.now(), type: "dsn"));
   final TextEditingController _creditController = TextEditingController(text: '0.00');
   final TextEditingController _eshopController = TextEditingController(text: '0.00');
+  final TextEditingController _currencyController = TextEditingController(text: '0.00');
+
   late List<TextEditingController> quantityCoinsControllers;
+  late SimpleFontelicoProgressDialog _dialog;
   late List<bool> _checkList = [];
   late Sale _seller;
 
@@ -43,6 +47,9 @@ class _HomeState extends State<Home> {
   // List<Map<String, dynamic>> eshopDataNew = [];
   Map<String, dynamic> eshopDataNew = {};
 
+  //Curency
+  Map<String, dynamic> currencyDataNew = {};
+
   //TransactionOnly
   List<Transaction> _transactionOnly = [];
 
@@ -55,7 +62,7 @@ class _HomeState extends State<Home> {
   DateTime? selectedDate;
   bool _reportload = false;
   bool _saleload = false;
-  bool _transactionLoad = false;
+  // bool _transactionLoad = false;
   Uint8List? _report;
 
   String _saleCode = '';
@@ -65,7 +72,7 @@ class _HomeState extends State<Home> {
   List<Notesandcoins> coinsData = [];
   double sumAmtNotes = 0.0;
   double previousSumAmtNotes = 0.0;
-  double sumAmtAll = 0.0;
+  double sumAmtAll = 0.0; //รวมทั้งมหด
 
   //credit
   double previousCreditAmount = 0.0;
@@ -76,6 +83,10 @@ class _HomeState extends State<Home> {
   double previousEshopAmount = 0.0;
   double payEshopTotal = 0.0;
 
+  //Currency
+  double sumAmtCurrency = 0.0;
+  double previousCurrencyAmount = 0.0;
+
   final Map<String, Map<String, double>> notesMap = {};
 
   @override
@@ -83,6 +94,7 @@ class _HomeState extends State<Home> {
     super.initState();
     
     selectedDate = DateTime.now();
+    _dialog = SimpleFontelicoProgressDialog(context: context);
     quantityCoinsControllers = List.generate(coins.length, (_) => TextEditingController());
     _checkList = List.generate(coins.length, (_) => false);
     _dBPayType();
@@ -247,6 +259,11 @@ class _HomeState extends State<Home> {
         double sumAmteShop = onValue[0].payeshop!.isNotEmpty ? onValue[0].payeshop!.fold(0.0, (sum, item) => sum + (double.parse(item.amount ?? '0.0'))) : 0.0;
         _eshopController.text = sumAmteShop.toStringAsFixed(2);
         previousEshopAmount = sumAmteShop;
+
+        //currency
+        double sumAmtCurrency = onValue[0].notesandcoinsDetail!.isNotEmpty ? onValue[0].notesandcoinsDetail!.fold(0.0, (sum, item) => sum + (double.parse(item.amount ?? '0.0'))) : 0.0;
+        _currencyController.text = sumAmtCurrency.toStringAsFixed(2);
+        previousCurrencyAmount = sumAmtCurrency;
       }
     });
   }
@@ -280,6 +297,16 @@ class _HomeState extends State<Home> {
         print('payAdvanceData ok! ${datas.amount}');
       } */
     });
+  }
+
+  void _showLoadingDialog() {
+    _dialog.show(
+      message: 'Loading...',
+      type: SimpleFontelicoProgressDialogType.custom, 
+      hideText: true, 
+      loadingIndicator: LoadingAnimationWidget.threeArchedCircle(color: AppColors.golden, size: 100), 
+      backgroundColor: Colors.transparent
+    );
   }
 
   @override
@@ -334,17 +361,22 @@ class _HomeState extends State<Home> {
                 ),
               ),
               SizedBox(width: width * .27),
-              /* _buildButton('อัพเดทยอดเงิน', width, height, coinsDataNew.isNotEmpty ? () async {
+              _buildButton('อัพเดทยอดเงิน', width, height, () async {
+                // _showLoadingDialog();
                 // if(coinsDataNew.isNotEmpty || eshopDataNew.isNotEmpty) await Dbconnect().savepayment(notes: coinsDataNew, salecode: _seller.userid!, saledate: dateformat(date: DateTime.now(), type: 'db'), payeshop: eshopDataNew, creditcard: _creditController.text);
-                _creditController.clear();
-                coinsDataNew.clear();
-                eshopDataNew.clear();
+                // await Dbconnect().saveCurrency(data: currencyDataNew);
+                // _dialog.hide();
 
-                _dBTransactionOnly();
+                // _creditController.clear();
+                // coinsDataNew.clear();
+                // eshopDataNew.clear();
+                // currencyDataNew.clear();
+
+                // _dBTransactionOnly();
                 // _dBTransactionAll();
 
-              } : null, AppColors.darkPink, width * .09),
-              SizedBox(width: width * .01), */
+              }, AppColors.darkPink, width * .09),
+              SizedBox(width: width * .01),
               _buildButton('ใบสรุปส่งเงินรายได้', width, height, () async {
                 setState(() {
                   _reportload = false;
@@ -448,7 +480,7 @@ class _HomeState extends State<Home> {
                     SizedBox(height: height * .015),
                     Row(
                       children: [
-                        rowHeader('Credit Card', width * .07, width * .0085, radius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))),
+                        rowHeader('Credit Card', width * .08, width * .0085, radius: const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))),
                         SizedBox(width: width * .02),
                         Container(
                           width: width * .07, //130
@@ -477,7 +509,7 @@ class _HomeState extends State<Home> {
                     ),
                     Row(
                       children: [
-                        rowHeader('E-Shop', width * .07, width * .0085, radius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8))),
+                        rowHeader('E-Shop', width * .08, width * .0085),
                         SizedBox(width: width * .02),
                         Container(
                           width: width * .07, //130
@@ -504,6 +536,49 @@ class _HomeState extends State<Home> {
                               print('coinsDataNew >> ${eshopDataNew.length}');
                             },
                             controller: _eshopController,
+                            style: TextStyle(fontSize: width * .009, fontFamily: AppFonts.pgVim), //18
+                            decoration: InputDecoration(
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: AppColors.pinkcm, width: 2),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        rowHeader('Foreign Currency', width * .08, width * .0085, radius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8))),
+                        SizedBox(width: width * .02),
+                        Container(
+                          width: width * .07, //130
+                          margin: EdgeInsets.only(right: width * .03), //60
+                          child: TextField(
+                            textAlign: TextAlign.center,
+                            onChanged: (value) {
+                               double currency = double.tryParse(value) ?? 0.0;
+
+                               setState(() {
+                                sumAmtCurrency -= previousCurrencyAmount; // ลบค่าก่อนหน้า
+                                sumAmtCurrency += currency;              // บวกค่าปัจจุบัน
+                                previousCurrencyAmount = currency;    // อัปเดตค่าก่อนหน้า
+                              });
+
+                             /*  if (value.isNotEmpty && double.tryParse(value) != 0) {
+                                currencyDataNew = {
+                                  "saledate": dateformat(date: DateTime.now(), type: 'db'),
+                                  "userid": seller!.personId,
+                                  "currency_code": currencyCode,
+                                  "currency_name": currencyName,
+                                  "rate": rate,
+                                  "qty": double.parse(value),
+                                  "amount": (rate * double.parse(value)).toStringAsFixed(2)
+                                };
+                              } */
+                              print('Currency $currencyDataNew');
+                              print('coinsDataCurrencyNew >> ${currencyDataNew.length}');
+                            },
+                            controller: _currencyController,
                             style: TextStyle(fontSize: width * .009, fontFamily: AppFonts.pgVim), //18
                             decoration: InputDecoration(
                               focusedBorder: UnderlineInputBorder(
@@ -591,7 +666,7 @@ class _HomeState extends State<Home> {
                     activeColor: AppColors.darkPink,
                     onChanged: (/* _saleCode.isNotEmpty &&  */_saleCode == sale.code) ?  (bool? value) async {
                       setState(() {
-                        _checkList[index] = value!;
+                        _checkList[index] = value ?? false;
                       });
                     } : null,
                   ),
@@ -689,6 +764,7 @@ class _HomeState extends State<Home> {
     return SizedBox(
       width: width,
       child: TextField(
+        // enabled: _checkList[0],
         textAlign: TextAlign.center,
         onChanged: (value) {
           setState(() {
