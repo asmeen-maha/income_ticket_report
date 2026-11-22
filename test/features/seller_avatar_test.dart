@@ -63,7 +63,10 @@ void main() {
   // NetworkImage keeps one HttpClient for the whole run, so install the
   // fake server before the first image loads.
   setUpAll(() => HttpOverrides.global = _PhotoOverrides());
-  setUp(() => SellerPhotos.baseUrl = 'http://photos.test/personpic/');
+  setUp(() {
+    SellerPhotos.reset();
+    SellerPhotos.baseUrl = 'http://photos.test/personpic/';
+  });
 
   test('photo URL uses the upper-case staff code', () {
     final provider = SellerPhotos.of(' f00424 ') as ResizeImage;

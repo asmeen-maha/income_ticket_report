@@ -29,7 +29,7 @@ flutter build web --release --pwa-strategy=none \
 | CanvasKit (`www.gstatic.com/flutter-canvaskit`) | `web/flutter_bootstrap.js` → `canvasKitBaseUrl: "canvaskit/"` |
 | ฟอนต์ Roboto ตอนเปิดแอป (`fonts.gstatic.com`) | `pubspec.yaml` ประกาศ family `Roboto` ชี้ไปที่ฟอนต์ในแอป |
 | ฟอนต์สำรองเมื่อไม่มีตัวอักษร (`fonts.gstatic.com`) | `web/flutter_bootstrap.js` → `fontFallbackBaseUrl` ชี้ภายใน |
-| pdf.js สำหรับแสดง PDF (`unpkg.com`) | `web/index.html` → `window.dartPdfJsBaseUrl = "assets/pdfjs/"` |
+| pdf.js สำหรับแสดง PDF (`unpkg.com`) | `web/index.html` โหลด `assets/pdfjs/pdf.min.js` เอง (ห้ามใช้ `dartPdfJsBaseUrl` ของ printing 5.14.2 เพราะมีบั๊ก error `type 'String' is not a subtype of type 'Never'`) |
 | ฟอนต์ UI (Prompt, Noto Sans Thai) | อยู่ใน `assets/fonts/` (SIL OFL, ไฟล์ license อยู่ข้างกัน) |
 
 ข้อควรระวัง
@@ -41,7 +41,9 @@ flutter build web --release --pwa-strategy=none \
 
 รูปโหลดจาก `http://172.2.200.50/personpic/<รหัสพนักงาน>.jpg` เช่น `F00424.jpg`
 
-เซิร์ฟเวอร์รูป (nginx) **ยังไม่ส่ง header CORS** เบราว์เซอร์จึงบล็อกรูปเมื่อแอปเปิดจากเซิร์ฟเวอร์อื่น แอปจะแสดงอักษรย่อแทนโดยไม่มีอะไรเสีย เลือกแก้ได้ 1 ใน 2 ทาง:
+เซิร์ฟเวอร์รูป (nginx) **ยังไม่ส่ง header CORS** ตัววาดภาพของ Flutter (CanvasKit) จึงโหลดรูปไม่ได้ ใน console จะเห็น `[object ProgressEvent]` แอปจะสลับไปแสดงรูปด้วยแท็ก `<img>` ของ HTML ซึ่งไม่ต้องใช้ CORS ให้อัตโนมัติ รูปจึงขึ้นแม้ไม่ได้แก้เซิร์ฟเวอร์ และใน console จะมีข้อความว่า `Staff photos: the browser blocked ...`
+
+ทาง `<img>` ใช้งานได้ปกติ แต่ทาง Flutter เร็วกว่าและใช้หน่วยความจำน้อยกว่า เพราะถอดรหัสรูปที่ 96 px และไม่ต้องสร้าง HTML element ต่อรูป ถ้าทำได้ แนะนำแก้ที่เซิร์ฟเวอร์ 1 ใน 2 ทาง:
 
 **ทาง A: เพิ่ม header ที่ nginx ของ 172.2.200.50** (ง่ายที่สุด ไม่ต้อง build ใหม่)
 
@@ -63,7 +65,8 @@ flutter build web --release --pwa-strategy=none --dart-define=PHOTO_BASE_URL=per
 Performance ของรูป
 - ถอดรหัสรูปที่ความกว้าง 96 px แทนขนาดเต็ม ใช้ cache ร่วมกันทุกจุดที่แสดงรูปคนเดียวกัน
 - รายชื่อสร้างแถวแบบ lazy โหลดรูปเฉพาะแถวที่มองเห็น
-- รูปที่โหลดไม่ได้จะถูกจำไว้ ไม่ยิงซ้ำ และเขียนสาเหตุลง console ของเบราว์เซอร์ครั้งเดียว
+- รูปที่ไม่มีอยู่จริง (404) จะถูกจำไว้ ไม่ยิงซ้ำ และเขียนสาเหตุลง console ครั้งเดียว
+- ถ้าเจอ CORS ครั้งแรก รูปที่เหลือจะไปใช้ `<img>` ทันที ไม่ยิงรอบที่ล้มซ้ำ
 - ระหว่างรอรูปจะแสดงอักษรย่อ รูปมาแล้วค่อย fade เข้า หน้าจอไม่กระตุก
 
 ## โครงสร้างโค้ด

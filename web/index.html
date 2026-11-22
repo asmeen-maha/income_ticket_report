@@ -6,7 +6,6 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Income Report — ตรวจสอบและพิมพ์ใบนำส่งรายได้ฝ่ายบัตร">
 
   <link rel="icon" type="image/png" href="favicon.png">
@@ -18,10 +17,16 @@
     html, body { margin: 0; height: 100%; background: #F4EEE6; }
   </style>
 
+  <!--
+    The `printing` package needs pdf.js and would fetch it from unpkg.com.
+    Load the bundled copy here instead: when `pdfjsLib` already exists the
+    package skips its own loader. (Its `dartPdfJsBaseUrl` override is broken
+    in printing 5.14.2: "type 'String' is not a subtype of type 'Never'".)
+    Loaded synchronously so it is always ready before the app starts.
+  -->
+  <script src="assets/pdfjs/pdf.min.js"></script>
   <script>
-    // The `printing` package loads pdf.js on first preview. Point it at the
-    // bundled copy so it never falls back to unpkg.com.
-    window.dartPdfJsBaseUrl = "assets/pdfjs/";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "assets/pdfjs/pdf.worker.min.js";
   </script>
 </head>
 <body>

@@ -4,12 +4,15 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/name_utils.dart';
 import '../../../data/services/seller_photos.dart';
+import 'html_photo/html_photo.dart';
 
 enum AvatarTone { neutral, active, verified }
 
 /// Staff photo in a circle. Initials show while the photo loads and stay
 /// if there is no photo. [AvatarTone.active] adds a terracotta ring,
 /// [AvatarTone.verified] a teal check badge.
+///
+/// See [SellerPhotos] for how the photo is loaded.
 class SellerAvatar extends StatelessWidget {
   const SellerAvatar({
     super.key,
@@ -28,8 +31,20 @@ class SellerAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photo = SellerPhotos.of(code);
-    if (photo == null) return _Initials(name: name, tone: tone, size: size);
+    return ValueListenableBuilder<bool>(
+      valueListenable: SellerPhotos.htmlMode,
+      builder: (context, _, __) => _build(context),
+    );
+  }
+
+  Widget _build(BuildContext context) {
+    final url = SellerPhotos.url(code);
+    if (url == null) return _Initials(name: name, tone: tone, size: size);
+
+    // HTML elements sit above Flutter's canvas; while a dialog covers this
+    // page they would show through it, so fall back to initials then.
+    final canUseHtml = ModalRoute.of(context)?.isCurrent ?? true;
+    if (SellerPhotos.useHtmlImage) return _htmlPhoto(url, canUseHtml);
 
     return SizedBox.square(
       dimension: size,
@@ -38,7 +53,7 @@ class SellerAvatar extends StatelessWidget {
         children: [
           ClipOval(
             child: Image(
-              image: photo,
+              image: SellerPhotos.of(code)!,
               width: size,
               height: size,
               fit: BoxFit.cover,
@@ -59,8 +74,10 @@ class SellerAvatar extends StatelessWidget {
                   ),
                 ]);
               },
+              // A blocked photo flips SellerPhotos.htmlMode and this avatar
+              // rebuilds through _htmlPhoto; a missing one keeps initials.
               errorBuilder: (context, error, stackTrace) {
-                SellerPhotos.markFailed(code, error);
+                SellerPhotos.reportFailure(code, error);
                 return _Initials(name: name, tone: tone, size: size);
               },
             ),
@@ -91,6 +108,25 @@ class SellerAvatar extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+
+  /// `<img>` over the initials (which show if the image fails or while a
+  /// dialog is open). Ring and badge are drawn by the HTML element.
+  Widget _htmlPhoto(String url, bool canUseHtml) {
+    final html = canUseHtml
+        ? buildHtmlPhoto(
+            url: url,
+            size: size,
+            ringColor: tone == AvatarTone.active ? AppColors.primary : null,
+            badgeColor: tone == AvatarTone.verified ? AppColors.teal : null,
+          )
+        : null;
+    final initials = _Initials(name: name, tone: tone, size: size);
+    if (html == null) return initials;
+    return SizedBox.square(
+      dimension: size,
+      child: Stack(children: [initials, html]),
     );
   }
 
