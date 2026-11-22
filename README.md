@@ -37,6 +37,35 @@ flutter build web --release --pwa-strategy=none \
 - API ต้องตอบ header `Access-Control-Allow-Origin` (ปัจจุบันตั้งเป็น `*` แล้ว) ถ้าย้ายเซิร์ฟเวอร์ต้องคงไว้
 - ไม่มี service worker แล้ว deploy เวอร์ชันใหม่ ผู้ใช้กด reload ก็ได้ของใหม่ ควรตั้ง web server ให้ `index.html` และ `flutter_bootstrap.js` ส่ง `Cache-Control: no-cache`
 
+## รูปพนักงาน
+
+รูปโหลดจาก `http://172.2.200.50/personpic/<รหัสพนักงาน>.jpg` เช่น `F00424.jpg`
+
+เซิร์ฟเวอร์รูป (nginx) **ยังไม่ส่ง header CORS** เบราว์เซอร์จึงบล็อกรูปเมื่อแอปเปิดจากเซิร์ฟเวอร์อื่น แอปจะแสดงอักษรย่อแทนโดยไม่มีอะไรเสีย เลือกแก้ได้ 1 ใน 2 ทาง:
+
+**ทาง A: เพิ่ม header ที่ nginx ของ 172.2.200.50** (ง่ายที่สุด ไม่ต้อง build ใหม่)
+
+```nginx
+location /personpic/ {
+    add_header Access-Control-Allow-Origin *;
+    add_header Cache-Control "public, max-age=86400";
+}
+```
+
+**ทาง B: ให้ web server ที่วางแอป proxy `/personpic/` ไปที่ 172.2.200.50** แล้ว build ด้วย
+
+```sh
+flutter build web --release --pwa-strategy=none --dart-define=PHOTO_BASE_URL=personpic/
+```
+
+ปิดการแสดงรูปทั้งหมดได้ด้วย `--dart-define=PHOTO_BASE_URL=`
+
+Performance ของรูป
+- ถอดรหัสรูปที่ความกว้าง 96 px แทนขนาดเต็ม ใช้ cache ร่วมกันทุกจุดที่แสดงรูปคนเดียวกัน
+- รายชื่อสร้างแถวแบบ lazy โหลดรูปเฉพาะแถวที่มองเห็น
+- รูปที่โหลดไม่ได้จะถูกจำไว้ ไม่ยิงซ้ำ และเขียนสาเหตุลง console ของเบราว์เซอร์ครั้งเดียว
+- ระหว่างรอรูปจะแสดงอักษรย่อ รูปมาแล้วค่อย fade เข้า หน้าจอไม่กระตุก
+
 ## โครงสร้างโค้ด
 
 ```

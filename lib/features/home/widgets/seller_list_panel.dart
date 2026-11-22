@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/seller_transaction.dart';
+import 'seller_avatar.dart';
 import 'ui_kit.dart';
 
 /// Left tile: search plus sellers grouped into "รอตรวจ" and "ตรวจแล้ว".
@@ -50,34 +51,47 @@ class SellerListPanel extends StatelessWidget {
           Expanded(
             child: noMatches
                 ? Center(child: Text('ไม่พบผู้จำหน่ายที่ค้นหา', style: AppText.caption()))
-                : ListView(
-                    children: [
-                      if (pending.isNotEmpty) ...[
-                        _GroupHeading(
-                          'รอตรวจ',
-                          count: pending.length,
-                          background: AppColors.primarySoft,
-                          foreground: AppColors.primaryText,
-                        ),
-                        for (final seller in pending) _row(seller),
-                      ],
-                      if (verified.isNotEmpty) ...[
-                        const SizedBox(height: 6),
-                        _GroupHeading(
-                          'ตรวจแล้ว',
-                          count: verified.length,
-                          background: AppColors.tealSoft,
-                          foreground: AppColors.teal,
-                        ),
-                        for (final seller in verified) _row(seller),
-                      ],
-                    ],
+                // Built lazily: only visible rows exist, so only their
+                // photos are requested.
+                : ListView.builder(
+                    itemCount: _entries.length,
+                    itemBuilder: (context, index) => switch (_entries[index]) {
+                      _Heading(:final verifiedGroup) => verifiedGroup
+                          ? Padding(
+                              padding: EdgeInsets.only(top: pending.isEmpty ? 0 : 6),
+                              child: _GroupHeading(
+                                'ตรวจแล้ว',
+                                count: verified.length,
+                                background: AppColors.tealSoft,
+                                foreground: AppColors.teal,
+                              ),
+                            )
+                          : _GroupHeading(
+                              'รอตรวจ',
+                              count: pending.length,
+                              background: AppColors.primarySoft,
+                              foreground: AppColors.primaryText,
+                            ),
+                      _Seller(:final seller) => _row(seller),
+                    },
                   ),
           ),
         ],
       ),
     );
   }
+
+  /// Headings and rows flattened into one list for [ListView.builder].
+  List<_Entry> get _entries => [
+        if (pending.isNotEmpty) ...[
+          const _Heading(verifiedGroup: false),
+          for (final s in pending) _Seller(s),
+        ],
+        if (verified.isNotEmpty) ...[
+          const _Heading(verifiedGroup: true),
+          for (final s in verified) _Seller(s),
+        ],
+      ];
 
   Widget _row(SellerTransaction seller) => Padding(
         padding: const EdgeInsets.only(bottom: 4),
@@ -88,6 +102,22 @@ class SellerListPanel extends StatelessWidget {
           onVerify: () => onVerify(seller),
         ),
       );
+}
+
+sealed class _Entry {
+  const _Entry();
+}
+
+class _Heading extends _Entry {
+  const _Heading({required this.verifiedGroup});
+
+  final bool verifiedGroup;
+}
+
+class _Seller extends _Entry {
+  const _Seller(this.seller);
+
+  final SellerTransaction seller;
 }
 
 class _SearchField extends StatelessWidget {
@@ -181,9 +211,7 @@ class _SellerRow extends StatelessWidget {
       color: selected ? AppColors.primarySoft : Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.row),
-        side: selected
-            ? const BorderSide(color: AppColors.primary, width: 1.5)
-            : BorderSide.none,
+        side: selected ? const BorderSide(color: AppColors.primary, width: 1.5) : BorderSide.none,
       ),
       clipBehavior: Clip.antiAlias,
       child: Row(
@@ -196,7 +224,7 @@ class _SellerRow extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: Row(children: [
-                    SellerAvatar(name: seller.name, tone: tone),
+                    SellerAvatar(name: seller.name, code: seller.code, tone: tone),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -207,12 +235,15 @@ class _SellerRow extends StatelessWidget {
                             seller.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: AppText.body(weight: selected ? FontWeight.w600 : FontWeight.w500),
+                            style:
+                                AppText.body(weight: selected ? FontWeight.w600 : FontWeight.w500),
                           ),
                           Text(
                             subtitle,
                             style: AppText.caption(
-                              color: selected && !verified ? AppColors.primaryText : AppColors.textMuted,
+                              color: selected && !verified
+                                  ? AppColors.primaryText
+                                  : AppColors.textMuted,
                             ),
                           ),
                         ],
@@ -264,7 +295,8 @@ class _CheckToggle extends StatelessWidget {
                   onChanged: enabled ? (_) => onVerify() : null,
                   activeColor: AppColors.teal,
                   fillColor: verified ? const WidgetStatePropertyAll(AppColors.teal) : null,
-                  side: BorderSide(color: enabled ? AppColors.primary : AppColors.disabledIcon, width: 1.5),
+                  side: BorderSide(
+                      color: enabled ? AppColors.primary : AppColors.disabledIcon, width: 1.5),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),

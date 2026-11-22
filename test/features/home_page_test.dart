@@ -5,6 +5,7 @@ import 'package:income_report/data/models/booking_payment.dart';
 import 'package:income_report/data/models/pay_type.dart';
 import 'package:income_report/data/models/seller_transaction.dart';
 import 'package:income_report/data/services/income_api.dart';
+import 'package:income_report/data/services/seller_photos.dart';
 import 'package:income_report/features/home/home_controller.dart';
 import 'package:income_report/features/home/home_page.dart';
 
@@ -83,6 +84,7 @@ void main() {
   }
 
   setUp(() {
+    SellerPhotos.baseUrl = ''; // no network images in page tests
     api = _FakeApi([
       _seller('1', 'F001', 'สมชาย ตัวอย่าง'),
       _seller('2', 'F002', 'สมหญิง ทดสอบ', verified: true),

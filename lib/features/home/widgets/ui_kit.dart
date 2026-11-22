@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/name_utils.dart';
 
 /// Rounded "bento" tile.
 class Tile extends StatelessWidget {
@@ -180,38 +179,6 @@ class StatusPill extends StatelessWidget {
             background: AppColors.primarySoft,
             foreground: AppColors.primaryText,
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5));
-  }
-}
-
-enum AvatarTone { neutral, active, verified }
-
-/// Initials in a circle; verified sellers get a check mark instead.
-class SellerAvatar extends StatelessWidget {
-  const SellerAvatar({super.key, required this.name, required this.tone, this.size = 34});
-
-  final String name;
-  final AvatarTone tone;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final (background, foreground) = switch (tone) {
-      AvatarTone.neutral => (AppColors.sunken, AppColors.textSubtle),
-      AvatarTone.active => (AppColors.primary, AppColors.white),
-      AvatarTone.verified => (AppColors.tealSoft, AppColors.teal),
-    };
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(color: background, shape: BoxShape.circle),
-      child: tone == AvatarTone.verified
-          ? Icon(Icons.check_rounded, size: size * .5, color: foreground)
-          : Text(
-              initialsOf(name),
-              style: AppText.body(size: size * .38, weight: FontWeight.w600, color: foreground),
-            ),
-    );
   }
 }
 

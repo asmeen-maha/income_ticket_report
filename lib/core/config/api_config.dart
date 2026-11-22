@@ -16,6 +16,15 @@ abstract final class ApiConfig {
     defaultValue: 'http://172.2.200.200/cmfrontapp/ticketing/ticketapi/datamodule/selfticketing.php',
   );
 
+  /// Staff photos, `<base><STAFF CODE>.jpg`. Empty disables photos.
+  /// The server must send `Access-Control-Allow-Origin` (or serve the app
+  /// from the same host), otherwise the browser blocks the images and the
+  /// app falls back to initials.
+  static const photoBaseUrl = String.fromEnvironment(
+    'PHOTO_BASE_URL',
+    defaultValue: 'http://172.2.200.50/personpic/',
+  );
+
   /// Without these a dead server leaves the screen loading forever.
   static const connectTimeout = Duration(seconds: 10);
   static const receiveTimeout = Duration(seconds: 30);

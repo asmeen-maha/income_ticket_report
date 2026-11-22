@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/money_utils.dart';
 import '../../../data/models/seller_transaction.dart';
+import 'seller_avatar.dart';
 import 'ui_kit.dart';
 
 /// Middle column: the selected seller's cash count, other payment channels
@@ -121,7 +122,12 @@ class _CashTile extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
             child: Row(children: [
-              SellerAvatar(name: seller.name, tone: AvatarTone.active, size: 44),
+              SellerAvatar(
+                name: seller.name,
+                code: seller.code,
+                tone: seller.isVerified ? AvatarTone.verified : AvatarTone.active,
+                size: 44,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

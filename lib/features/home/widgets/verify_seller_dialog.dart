@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/date_utils.dart';
 import '../../../core/utils/money_utils.dart';
 import '../../../data/models/seller_transaction.dart';
+import 'seller_avatar.dart';
 import 'ui_kit.dart';
 
 /// Shows the seller's totals and asks the cashier to confirm. [onConfirm]
@@ -99,7 +100,7 @@ class _VerifySellerDialogState extends State<_VerifySellerDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(children: [
-                const IconTile(icon: Icons.fact_check_outlined, size: 44),
+                SellerAvatar(name: s.name, code: s.code, tone: AvatarTone.active, size: 44),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
