@@ -1,0 +1,80 @@
+[
+  {
+    "userid": "9803",
+    "code": "F00424",
+    "name": "อารยา หวันอิ",
+    "payeshop": [
+      {
+        "idpayeshop": "50109",
+        "point": "TK",
+        "saledate": "2025-09-29 00:00:00",
+        "salecode": "10423",
+        "referno": "c68d79",
+        "amount": "4200.00",
+        "docdate": "2025-09-27 00:00:00"
+      },
+      {
+        "idpayeshop": "50109",
+        "point": "TK",
+        "saledate": "2025-09-29 00:00:00",
+        "salecode": "10423",
+        "referno": "payIn",
+        "amount": "2500.00",
+        "docdate": "2025-09-27 00:00:00"
+      },
+      {
+        "idpayeshop": "50109",
+        "point": "TK",
+        "saledate": "2025-09-29 00:00:00",
+        "salecode": "10423",
+        "referno": "payIn",
+        "amount": "1900.00",
+        "docdate": "2025-09-27 00:00:00"
+      }
+    ]
+  },
+  {
+    "userid": "10582",
+    "code": "F00937",
+    "name": "สารีนา ดุมลักษณ์",
+    "flagcheck": "Y",
+    "payeshop": [
+      {
+        "idpayeshop": "50112",
+        "point": "TK",
+        "saledate": "2025-09-29 00:00:00",
+        "salecode": "11909",
+        "referno": "c68d95",
+        "amount": "5200.00",
+        "docdate": "2025-09-28 00:00:00"
+      },
+      {
+        "idpayeshop": "50115",
+        "point": "TK",
+        "saledate": "2025-09-29 00:00:00",
+        "salecode": "11909",
+        "referno": "c68c8b",
+        "amount": "6000.00",
+        "docdate": "2025-09-16 00:00:00"
+      },
+      {
+        "idpayeshop": "50115",
+        "point": "TK",
+        "saledate": "2025-09-29 00:00:00",
+        "salecode": "11909",
+        "referno": "payIn",
+        "amount": "3500.00",
+        "docdate": "2025-09-16 00:00:00"
+      },
+      {
+        "idpayeshop": "50115",
+        "point": "TK",
+        "saledate": "2025-09-29 00:00:00",
+        "salecode": "11909",
+        "referno": "payIn",
+        "amount": "1500.00",
+        "docdate": "2025-09-16 00:00:00"
+      }
+    ]
+  }
+]
