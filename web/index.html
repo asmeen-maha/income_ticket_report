@@ -1,45 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <!--
-      If you are serving your web app in a path other than the root, change the
-      href value below to reflect the base path you are serving from.
+  <!-- Replaced by the `--base-href` argument of `flutter build web`. -->
+  <base href="$FLUTTER_BASE_HREF">
 
-      The path provided below has to start and end with a slash "/" in order for
-      it to work correctly.
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Income Report — ตรวจสอบและพิมพ์ใบนำส่งรายได้ฝ่ายบัตร">
 
-      For more details:
-      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>Income Report</title>
 
-      This is a placeholder for base href that will be replaced by the value of
-      the `--base-href` argument provided to `flutter build`.
-    -->
-    <base href="$FLUTTER_BASE_HREF">
+  <style>
+    /* Matches the app background so there is no white flash while loading. */
+    html, body { margin: 0; height: 100%; background: #F4EEE6; }
+  </style>
 
-    <meta charset="UTF-8">
-    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-    <meta name="description" content="A new Flutter project.">
-
-    <!-- iOS meta tags & icons -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="income_report">
-    <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-
-    <title>income_report</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <script>
+    // The `printing` package loads pdf.js on first preview. Point it at the
+    // bundled copy so it never falls back to unpkg.com.
+    window.dartPdfJsBaseUrl = "assets/pdfjs/";
+  </script>
 </head>
 <body>
-    <script src="assets/pdfjs/pdf.min.js"></script>
-    <script type="text/javascript">
-        pdfjsLib.GlobalWorkerOptions.workerSrc = "assets/pdfjs/pdf.worker.min.js";
-    </script>
-    <!-- <script src="assets/bootstrap/js/bootstrap.bundle.min.js" async></script> -->
-    <script src="flutter_bootstrap.js" async></script>
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

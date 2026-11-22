@@ -60,6 +60,14 @@ void main() {
     });
   });
 
+  test('empty or null bodies mean "no data", not an error', () {
+    for (final body in ['', '  ', 'null', '[]']) {
+      expect(parseJsonList(body, SellerTransaction.fromJson), isEmpty, reason: 'body "$body"');
+    }
+    expect(() => parseJsonList('<html>error</html>', SellerTransaction.fromJson),
+        throwsFormatException);
+  });
+
   group('DailySummary', () {
     test('sums sellers and merges denominations', () {
       final a = SellerTransaction.fromJson({

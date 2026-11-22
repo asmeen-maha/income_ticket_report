@@ -2,8 +2,14 @@ import 'dart:convert';
 
 typedef JsonMap = Map<String, dynamic>;
 
-/// The API sometimes returns a JSON string instead of decoded JSON.
-dynamic decodeJson(dynamic data) => data is String ? jsonDecode(data) : data;
+/// The API sometimes returns a JSON string instead of decoded JSON, and an
+/// empty body (or `null`) when there is nothing for the day.
+dynamic decodeJson(dynamic data) {
+  if (data is! String) return data;
+  final text = data.trim();
+  if (text.isEmpty || text == 'null') return null;
+  return jsonDecode(text);
+}
 
 /// Reads a field that may be a list of objects, a single object, or absent.
 List<T> parseJsonList<T>(dynamic value, T Function(JsonMap json) fromJson) {

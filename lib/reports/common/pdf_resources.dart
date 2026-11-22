@@ -32,5 +32,9 @@ class PdfFonts {
   }
 }
 
-Future<pw.MemoryImage> loadPdfImage(String asset) async =>
-    pw.MemoryImage((await rootBundle.load(asset)).buffer.asUint8List());
+final _images = <String, Future<pw.MemoryImage>>{};
+
+/// Loads (once) an image asset for embedding in a PDF.
+Future<pw.MemoryImage> loadPdfImage(String asset) => _images[asset] ??= rootBundle
+    .load(asset)
+    .then((data) => pw.MemoryImage(data.buffer.asUint8List()));

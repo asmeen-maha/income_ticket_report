@@ -28,7 +28,6 @@ class SellerTransaction {
   final List<ForeignCurrencyCount> foreignCurrencies;
 
   bool get isVerified => flagCheck == ApiCodes.verified;
-  bool get hasFlag => flagCheck?.isNotEmpty ?? false;
   String get displayName => '$code $name';
 
   double get creditCardTotal => creditCards.sumBy((e) => e.amount);
@@ -40,8 +39,16 @@ class SellerTransaction {
   double get payInTotal => eShopPayments.where((e) => e.isPayIn).sumBy((e) => e.amount);
   double get eShopExcludingPayIn => eShopTotal - payInTotal;
 
-  double get grandTotal =>
-      notesAndCoinsTotal + creditCardTotal + eShopTotal + foreignCurrencyTotal;
+  /// Thai notes & coins plus foreign currency (as on the daily statement).
+  double get cashTotal => notesAndCoinsTotal + foreignCurrencyTotal;
+
+  /// Credit card plus all e-shop rows (pay-ins included).
+  double get nonCashTotal => creditCardTotal + eShopTotal;
+
+  double get grandTotal => cashTotal + nonCashTotal;
+
+  int get eShopCount => eShopPayments.where((e) => !e.isPayIn).length;
+  int get payInCount => eShopPayments.where((e) => e.isPayIn).length;
 
   NoteCount? noteFor(double denomination) {
     for (final note in notesAndCoins) {

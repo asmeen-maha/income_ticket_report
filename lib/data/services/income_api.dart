@@ -9,7 +9,12 @@ import '../models/seller_transaction.dart';
 /// HTTP calls to the ticketing backends. Every method throws on failure;
 /// callers decide how to report it.
 class IncomeApi {
-  IncomeApi({Dio? dio}) : _dio = dio ?? Dio();
+  IncomeApi({Dio? dio})
+      : _dio = dio ??
+            Dio(BaseOptions(
+              connectTimeout: ApiConfig.connectTimeout,
+              receiveTimeout: ApiConfig.receiveTimeout,
+            ));
 
   final Dio _dio;
 

@@ -1,12 +1,12 @@
 {
-    "name": "income_report",
-    "short_name": "income_report",
+    "name": "Income Report",
+    "short_name": "Income Report",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#F4EEE6",
+    "theme_color": "#C64A20",
+    "description": "ตรวจสอบและพิมพ์ใบนำส่งรายได้ฝ่ายบัตร",
+    "orientation": "landscape",
     "prefer_related_applications": false,
     "icons": [
         {
